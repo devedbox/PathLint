@@ -1,3 +1,3 @@
 # PathLint
 
-A description of this package.
+The tool to lint the path.
