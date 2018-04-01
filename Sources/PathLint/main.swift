@@ -14,13 +14,9 @@
 do {
     if  let config = try Configuration.default() {
         let violations = try findPathsRecursively(using: config).flatMap { try lint(path: $0, using: config) }
-        print("✅Lint Done!")
         
-        if violations.filter({ $0.severity == .error }).isEmpty {
-            exit(0)
-        } else {
-            exit(1)
-        }
+        print("✅Lint Done!")
+        exit(violations.filter({ $0.severity == .error }).isEmpty ? 0 : 1)
     }
     
     exit(0)
