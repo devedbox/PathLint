@@ -78,7 +78,7 @@ public func lint(path: String, using config: Configuration) throws -> [Violation
         guard String(fileName[fileName.startIndex]).isUppercase() == $0.uppercasePrefix else {
             let violation = Violation(file: path,
                                       severity: $0.severity,
-                                      reason: "File Path Violation: The file name should \($0.uppercasePrefix ? "" : "not") be uppercase")
+                                      reason: "File Path Violation: File name `\(fileName)` should \($0.uppercasePrefix ? "" : "not") be uppercase")
             print(violation)
             violations.append(violation)
             return
@@ -86,7 +86,7 @@ public func lint(path: String, using config: Configuration) throws -> [Violation
         if !NSPredicate(format: "SELF MATCHES[cd] \"\($0.pattern)\"").evaluate(with: fileName) {
             let violation = Violation(file: path,
                                       severity: $0.severity,
-                                      reason: "File Path Violation: The file name should followd by the pattern: \($0.pattern)")
+                                      reason: "File Path Violation: File name `\(fileName)` should followd by the pattern: \($0.pattern)")
             print(violation)
             violations.append(violation)
         }
