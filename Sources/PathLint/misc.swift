@@ -7,7 +7,7 @@
 
 import Foundation
 
-public func checkPathRecursively(at path: String, founds: (String) -> Void) throws {
+public func findPathsRecursively(at path: String = FileManager.default.currentDirectoryPath, founds: (String) -> Void) throws {
     let fileManager = FileManager.default
     var isDirectory: ObjCBool = false
     
@@ -25,7 +25,7 @@ public func checkPathRecursively(at path: String, founds: (String) -> Void) thro
             isDirectory.boolValue {
             
             // Then check again.
-            try checkPathRecursively(at: path.path(byAppending: content), founds: founds)
+            try findPathsRecursively(at: path.path(byAppending: content), founds: founds)
         } else {
             // I think we have founds.
             founds(path.path(byAppending: content))
