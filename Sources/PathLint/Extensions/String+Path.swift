@@ -12,3 +12,9 @@ extension String {
         return "\(self)\(self.hasSuffix("/") ? "" : "/")\(path)"
     }
 }
+
+extension String {
+    internal func isUppercase() -> Bool {
+        return self == uppercased()
+    }
+}
