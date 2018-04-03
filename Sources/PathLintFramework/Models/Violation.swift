@@ -6,9 +6,9 @@
 //
 
 public struct Violation {
-    let file: String
-    let severity: Rule.Severity
-    let reason: String
+    public let file: String
+    public let severity: Rule.Severity
+    public let reason: String
 }
 
 extension Violation: CustomStringConvertible {
