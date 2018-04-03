@@ -5,7 +5,8 @@
             "path":"Models/",
             "pattern":"[a-zA-z0-9_-[\\+]]*Model.swift",
             "uppercasePrefix":true,
-            "severity": "error"
+            "severity":"error",
+            "ignores":[]
         }
     ],
     "excludes": 
@@ -20,4 +21,3 @@
         "Carthage"
     ]
 }
-
