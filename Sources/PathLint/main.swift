@@ -11,10 +11,13 @@
     import Darwin
 #endif
 import PathLintFramework
-    
-do {
-    exit(try lint(config: try Configuration.default()).filter { $0.severity == .error }.isEmpty ? 0 : 1)
-} catch let error {
-    print(error)
-    exit(2)
+
+execute(exit: 2) {
+    exit(
+        try lint(config: try Configuration.default())
+            .filter { $0.severity == .error }
+            .isEmpty
+            ? 0
+            : 1
+    )
 }

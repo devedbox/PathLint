@@ -5,6 +5,11 @@
 //  Created by devedbox on 2018/4/1.
 //
 
+#if os(Linux)
+    import Glibc
+#else
+    import Darwin
+#endif
 import Foundation
 
 public func getcwd() -> String {
@@ -60,4 +65,13 @@ public func lint(_ paths: [String], using config: Configuration) throws -> [Viol
 
 public func lint(path: String, using config: Configuration) throws -> [Violation] {
     return try config.rules.flatMap { try $0.lint(path: path, excludes: config.excludes) }
+}
+
+public func execute(exit exitCode: Int32, throwing: () throws -> Void) {
+    do {
+        try throwing()
+    } catch let error {
+        print(error)
+        exit(exitCode)
+    }
 }
