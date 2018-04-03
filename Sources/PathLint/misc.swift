@@ -67,29 +67,31 @@ public func lint(path: String, using config: Configuration) throws -> [Violation
         return []
     }
     
-    let rules = config.rules.filter { NSPredicate(format: "SELF MATCHES[cd] \"\(dir)[/]*\"").evaluate(with: $0.path) }
-    var violations: [Violation] = []
-    rules.forEach {
+    return
+        config.rules
+    .filter  { NSPredicate(format: "SELF MATCHES[cd] \"\(dir)[/]*\"").evaluate(with: $0.path) }
+    .flatMap { ele -> [Violation] in
         print("Linting \(path)")
-        guard !$0.ignores.contains(String(fileName)) else {
+        guard !ele.ignores.contains(String(fileName)) else {
             print("Ignoring \(fileName)")
-            return
+            return []
         }
-        guard String(fileName[fileName.startIndex]).isUppercase() == $0.uppercasePrefix else {
+        
+        var violations: [Violation] = []
+        if String(fileName[fileName.startIndex]).isUppercase() != ele.uppercasePrefix {
             let violation = Violation(file: path,
-                                      severity: $0.severity,
-                                      reason: "File Path Violation: File name `\(fileName)` should \($0.uppercasePrefix ? "" : "not") be uppercase")
-            print(violation)
-            violations.append(violation)
-            return
-        }
-        if !NSPredicate(format: "SELF MATCHES[cd] \"\($0.pattern)\"").evaluate(with: fileName) {
-            let violation = Violation(file: path,
-                                      severity: $0.severity,
-                                      reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \($0.pattern)")
+                                      severity: ele.severity,
+                                      reason: "File Path Violation: File name `\(fileName)` should \(ele.uppercasePrefix ? "" : "not") be uppercase")
             print(violation)
             violations.append(violation)
         }
+        if !NSPredicate(format: "SELF MATCHES[cd] \"\(ele.pattern)\"").evaluate(with: fileName) {
+            let violation = Violation(file: path,
+                                      severity: ele.severity,
+                                      reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \(ele.pattern)")
+            print(violation)
+            violations.append(violation)
+        }
+        return violations
     }
-    return violations
 }
