@@ -5,6 +5,8 @@
 //  Created by devedbox on 2018/4/1.
 //
 
+import Foundation
+
 public struct Rule: Decodable {
     public enum Severity: String, Decodable {
         case warning
@@ -18,4 +20,52 @@ public struct Rule: Decodable {
     let severity: Severity
     
     let ignores: [String]
+}
+
+extension Rule {
+    /// Lint the given path with the rule
+    public func lint(path: String, excludes: [String], hit: ((Violation) -> Void)? = { print($0) }) throws -> [Violation] {
+        var isDirectory: ObjCBool = false
+        
+        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else {
+            print("💔File does not exist at \(path).")
+            return []
+        }
+        guard !isDirectory.boolValue else {
+            print("💔Empty contents at \(path).")
+            return []
+        }
+        
+        var components = path.split(separator: "/")
+        let fileName = components.removeLast()
+        guard let dir = components.last
+            , !excludes.contains(String(dir)) else {
+                print("💔Excluding path: \(path).")
+                return []
+        }
+        
+        print("Linting \(path)")
+        
+        guard !ignores.contains(String(fileName)) else {
+            print("Ignoring \(fileName)")
+            return []
+        }
+        
+        var violations: [Violation] = []
+        if String(fileName[fileName.startIndex]).isUppercase() != uppercasePrefix {
+            let violation = Violation(file: path,
+                                      severity: severity,
+                                      reason: "File Path Violation: File name `\(fileName)` should \(uppercasePrefix ? "" : "not") be uppercase")
+            hit?(violation)
+            violations.append(violation)
+        }
+        if !NSPredicate(format: "SELF MATCHES[cd] \"\(pattern)\"").evaluate(with: fileName) {
+            let violation = Violation(file: path,
+                                      severity: severity,
+                                      reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \(pattern)")
+            hit?(violation)
+            violations.append(violation)
+        }
+        return violations
+    }
 }

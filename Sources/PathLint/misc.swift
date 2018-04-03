@@ -48,50 +48,5 @@ public func findPathsRecursively(at path: String = getcwd(), using config: Confi
 }
 
 public func lint(path: String, using config: Configuration) throws -> [Violation] {
-    let fileManager = FileManager.default
-    var isDirectory: ObjCBool = false
-    
-    guard fileManager.fileExists(atPath: path, isDirectory: &isDirectory) else {
-        print("💔File does not exist at \(path).")
-        return []
-    }
-    guard !isDirectory.boolValue else {
-        return []
-    }
-    
-    var components = path.split(separator: "/")
-    let fileName = components.removeLast()
-    guard let dir = components.last
-        , !config.excludes.contains(String(dir)) else {
-        print("💔Excluding path: \(path).")
-        return []
-    }
-    
-    return
-        config.rules
-    .filter  { NSPredicate(format: "SELF MATCHES[cd] \"\(dir)[/]*\"").evaluate(with: $0.path) }
-    .flatMap { ele -> [Violation] in
-        print("Linting \(path)")
-        guard !ele.ignores.contains(String(fileName)) else {
-            print("Ignoring \(fileName)")
-            return []
-        }
-        
-        var violations: [Violation] = []
-        if String(fileName[fileName.startIndex]).isUppercase() != ele.uppercasePrefix {
-            let violation = Violation(file: path,
-                                      severity: ele.severity,
-                                      reason: "File Path Violation: File name `\(fileName)` should \(ele.uppercasePrefix ? "" : "not") be uppercase")
-            print(violation)
-            violations.append(violation)
-        }
-        if !NSPredicate(format: "SELF MATCHES[cd] \"\(ele.pattern)\"").evaluate(with: fileName) {
-            let violation = Violation(file: path,
-                                      severity: ele.severity,
-                                      reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \(ele.pattern)")
-            print(violation)
-            violations.append(violation)
-        }
-        return violations
-    }
+    return try config.rules.flatMap { try $0.lint(path: path, excludes: config.excludes) }
 }
