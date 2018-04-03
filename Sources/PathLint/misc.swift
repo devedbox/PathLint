@@ -47,9 +47,17 @@ public func findPathsRecursively(at path: String = getcwd(), using config: Confi
     return paths
 }
 
-public func lint(path: String, using config: Configuration) throws -> [Violation] {
+public func lint(config: Configuration) throws -> [Violation] {
+    return try lint(findPathsRecursively(using: config), using: config)
+}
+
+public func lint(_ paths: [String], using config: Configuration) throws -> [Violation] {
     defer {
         print("✅Lint Done!")
     }
+    return try paths.flatMap { try lint(path: $0, using: config) }
+}
+
+public func lint(path: String, using config: Configuration) throws -> [Violation] {
     return try config.rules.flatMap { try $0.lint(path: path, excludes: config.excludes) }
 }

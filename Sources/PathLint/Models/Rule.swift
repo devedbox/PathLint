@@ -38,10 +38,17 @@ extension Rule {
         
         var components = path.split(separator: "/")
         let fileName = components.removeLast()
-        guard let dir = components.last
-            , !excludes.contains(String(dir)) else {
+        
+        guard
+            let dir = components.last,
+            !excludes.contains(String(dir))
+        else {
                 print("💔Excluding path: \(path).")
                 return []
+        }
+        
+        guard NSPredicate(format: "SELF MATCHES[cd] \"\(dir)[/]*\"").evaluate(with: self.path) else {
+            return []
         }
         
         print("Linting \(path)")
