@@ -20,10 +20,15 @@ public struct Configuration: Decodable {
 
 extension Configuration {
     public static func `default`() throws -> Configuration {
+        return try config(at: getcwd())
+    }
+}
+
+extension Configuration {
+    public static func config(at path: String) throws -> Configuration {
         let fileManager = FileManager.default
-        let cwd = getcwd()
         // Find `PathLint.json` if any.
-        let configPath = cwd.path(byAppending: ".pathlint.yml")
+        let configPath = path.path(byAppending: ".pathlint.yml")
         guard fileManager.fileExists(atPath: configPath) else {
             print("💔There is no configuration file exists.")
             throw ConfigurationError.fileNotExists
