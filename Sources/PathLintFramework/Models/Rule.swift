@@ -16,7 +16,6 @@ public struct Rule: Decodable {
     let path: String // The file directory end node: Models/
     let pattern: String // The pattern to lint the file name: [a-zA-Z0-9_-+]Model.swift
     
-    let uppercasePrefix: Bool
     let severity: Severity
     
     let ignores: [String]
@@ -59,13 +58,7 @@ extension Rule {
         }
         
         var violations: [Violation] = []
-        if String(fileName[fileName.startIndex]).isUppercase() != uppercasePrefix {
-            let violation = Violation(file: path,
-                                      severity: severity,
-                                      reason: "File Path Violation: File name `\(fileName)` should \(uppercasePrefix ? "" : "not") be uppercase")
-            hit?(violation)
-            violations.append(violation)
-        }
+        
         if !NSPredicate(format: "SELF MATCHES[cd] \"\(pattern)\"").evaluate(with: fileName) {
             let violation = Violation(file: path,
                                       severity: severity,
