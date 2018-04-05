@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Yams
 
 public enum ConfigurationError: String, Error {
     case fileNotExists = "There is no configuration file exists."
@@ -22,7 +23,7 @@ extension Configuration {
         let fileManager = FileManager.default
         let cwd = getcwd()
         // Find `PathLint.json` if any.
-        let configPath = cwd.path(byAppending: "PathLintFile")
+        let configPath = cwd.path(byAppending: ".pathlint.yml")
         guard fileManager.fileExists(atPath: configPath) else {
             print("💔There is no configuration file exists.")
             throw ConfigurationError.fileNotExists
@@ -30,10 +31,6 @@ extension Configuration {
         
         // Load the content of the file.
         let configString = try String(contentsOfFile: configPath, encoding: .utf8)
-        guard let configData = configString.data(using: .utf8) else {
-            print("💔Invalid configuration content at \(cwd).")
-            throw ConfigurationError.invalidData
-        }
-        return try JSONDecoder().decode(Configuration.self, from: configData)
+        return try YAMLDecoder().decode(Configuration.self, from: configString)
     }
 }

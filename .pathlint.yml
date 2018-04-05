@@ -1,0 +1,16 @@
+rules:
+- path: Models/
+  pattern: \[a-zA-z0-9_-\[\\+\]\]*Model.swift
+  uppercasePrefix: true
+  severity: error
+  ignores:
+    -
+excludes:
+  - .build
+  - .git
+  - .xcworkspace
+  - .xcodeproj
+  - .
+  - ..
+  - Pods
+  - Carthage
