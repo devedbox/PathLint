@@ -21,7 +21,7 @@ public struct Configuration: Decodable {
     }
     
     let basePattern: String
-    let rules: [Rule]
+    let rules: [PathRule]
     let excludes: [String] // The file directory to be excluded.
 }
 

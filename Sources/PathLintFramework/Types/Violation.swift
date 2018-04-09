@@ -7,7 +7,7 @@
 
 public struct Violation {
     public let file: String
-    public let severity: Rule.Severity
+    public let severity: ReportSeverity
     public let reason: String
 }
 

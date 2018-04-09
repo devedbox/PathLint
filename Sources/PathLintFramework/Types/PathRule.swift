@@ -1,5 +1,5 @@
 //
-//  Rule.swift
+//  PathRule.swift
 //  pathlint
 //
 //  Created by devedbox on 2018/4/1.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Rule: Decodable {
+public struct PathRule: RuleProtocol, Decodable {
     enum CodingKeys: String, CodingKey {
         case path
         case pattern
@@ -16,21 +16,16 @@ public struct Rule: Decodable {
         case ignores
     }
     
-    public enum Severity: String, Decodable {
-        case warning
-        case error
-    }
+    public let path: String // The file directory end node: Models/
+    public var pattern: String // The pattern to lint the file name: [a-zA-Z0-9_-+]Model.swift
     
-    let path: String // The file directory end node: Models/
-    let pattern: String // The pattern to lint the file name: [a-zA-Z0-9_-+]Model.swift
+    public var severity: ReportSeverity
+    public let isRelativedToBasePattern: Bool?
     
-    let severity: Severity
-    let isRelativedToBasePattern: Bool?
-    
-    let ignores: [String]
+    public let ignores: [String]
 }
 
-extension Rule {
+extension PathRule {
     /// Lint the given path with the rule
     public func lint(path: String,
                      config: Configuration,
