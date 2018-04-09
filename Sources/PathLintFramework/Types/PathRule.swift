@@ -31,15 +31,7 @@ extension PathRule {
                      config: Configuration,
                      hit: ((Violation) -> Void)? = { print($0) }) throws -> [Violation] {
         
-        var isDirectory: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else {
-            print("💔File does not exist at \(path).")
-            return []
-        }
-        guard !isDirectory.boolValue else {
-            print("💔Empty contents at \(path).")
-            return []
-        }
+        guard _checkingFileExists(at: path) == (true, true) else { return [] }
         
         var components = path.split(separator: "/")
         let fileName = components.removeLast()
