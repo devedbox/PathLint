@@ -14,6 +14,13 @@ public enum ConfigurationError: String, Error {
 }
 
 public struct Configuration: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case basePattern = "base_pattern"
+        case rules
+        case excludes
+    }
+    
+    let basePattern: String
     let rules: [Rule]
     let excludes: [String] // The file directory to be excluded.
 }

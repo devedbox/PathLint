@@ -11,7 +11,6 @@
     import Darwin
 #endif
 import PathLintFramework
-import Foundation
 
 execute(exit: 2) {
     exit(

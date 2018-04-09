@@ -13,6 +13,7 @@
 import Foundation
 
 public func getcwd() -> String {
+    return "/Users/devedbox/Library/Mobile Documents/com~apple~CloudDocs/Development/PathLint"
     return FileManager.default.currentDirectoryPath
 }
 

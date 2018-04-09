@@ -8,6 +8,14 @@
 import Foundation
 
 public struct Rule: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case path
+        case pattern
+        case severity
+        case isRelativedToBasePattern = "relative_to_base"
+        case ignores
+    }
+    
     public enum Severity: String, Decodable {
         case warning
         case error
@@ -17,6 +25,7 @@ public struct Rule: Decodable {
     let pattern: String // The pattern to lint the file name: [a-zA-Z0-9_-+]Model.swift
     
     let severity: Severity
+    let isRelativedToBasePattern: Bool?
     
     let ignores: [String]
 }
