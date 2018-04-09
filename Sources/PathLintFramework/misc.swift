@@ -16,6 +16,14 @@ public func getcwd() -> String {
     return FileManager.default.currentDirectoryPath
 }
 
+public func asyncPrint<T>(_ t: T, on queue: DispatchQueue) {
+    queue.async { print(t) }
+}
+
+public func syncPrint<T>(_ t: T, on queue: DispatchQueue) {
+    queue.sync { print(t) }
+}
+
 public func findPathsRecursively(at path: String = getcwd(), using config: Configuration) throws -> [String] {
     guard config.excludes.filter({ path.hasSuffix($0) }).isEmpty else {
         return []
