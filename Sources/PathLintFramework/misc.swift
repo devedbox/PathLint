@@ -12,17 +12,14 @@
 #endif
 import Foundation
 
+// MARK: - Public.
+
 public func getcwd() -> String {
     return FileManager.default.currentDirectoryPath
 }
 
-public func asyncPrint<T>(_ t: T, on queue: DispatchQueue) {
-    queue.async { print(t) }
-}
-
-public func syncPrint<T>(_ t: T, on queue: DispatchQueue) {
-    queue.sync { print(t) }
-}
+public func asyncPrint<T>(_ t: T, on queue: DispatchQueue = DispatchQueue.main) { queue.async { print(t) } }
+public func syncPrint<T>(_ t: T, on queue: DispatchQueue = DispatchQueue.main) { queue.sync { print(t) } }
 
 public func findPathsRecursively(at path: String = getcwd(), using config: Configuration) throws -> [String] {
     guard config.excludes.filter({ path.hasSuffix($0) }).isEmpty else {
@@ -82,4 +79,18 @@ public func execute(exit exitCode: Int32, throwing: () throws -> Void) {
         print(error)
         exit(exitCode)
     }
+}
+
+// MARK: - Internal.
+
+internal func _checkingFileExists(at path: String) -> (Bool, Bool) {
+    var isDirectory: ObjCBool = false
+    defer {
+        isDirectory.boolValue ? asyncPrint("💔Empty contents at \(path).") : ()
+    }
+    guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else {
+        asyncPrint("💔File does not exist at \(path).")
+        return (exists: false, isDirectory: isDirectory.boolValue)
+    }
+    return (exists: true, isDirectory: isDirectory.boolValue)
 }
