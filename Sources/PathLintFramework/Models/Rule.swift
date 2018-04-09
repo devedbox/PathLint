@@ -69,11 +69,12 @@ extension Rule {
         }
         
         var violations: [Violation] = []
+        let finalPattern = isRelativedToBasePattern ?? true ? config.basePattern + pattern : pattern
         
-        if !NSPredicate(format: "SELF MATCHES[cd] \"\(isRelativedToBasePattern ?? true ? config.basePattern + pattern : pattern)\"").evaluate(with: fileName) {
+        if !NSPredicate(format: "SELF MATCHES[cd] \"\(finalPattern)\"").evaluate(with: fileName) {
             let violation = Violation(file: path,
                                       severity: severity,
-                                      reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \(pattern)")
+                                      reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \(finalPattern)")
             hit?(violation)
             violations.append(violation)
         }
