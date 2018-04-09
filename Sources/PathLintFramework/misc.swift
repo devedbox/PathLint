@@ -13,7 +13,6 @@
 import Foundation
 
 public func getcwd() -> String {
-    return "/Users/devedbox/Library/Mobile Documents/com~apple~CloudDocs/Development/PathLint"
     return FileManager.default.currentDirectoryPath
 }
 
@@ -65,7 +64,7 @@ public func lint(_ paths: [String], using config: Configuration) throws -> [Viol
 }
 
 public func lint(path: String, using config: Configuration) throws -> [Violation] {
-    return try config.rules.flatMap { try $0.lint(path: path, excludes: config.excludes) }
+    return try config.rules.flatMap { try $0.lint(path: path, config: config) }
 }
 
 public func execute(exit exitCode: Int32, throwing: () throws -> Void) {

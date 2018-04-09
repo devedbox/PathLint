@@ -32,9 +32,11 @@ public struct Rule: Decodable {
 
 extension Rule {
     /// Lint the given path with the rule
-    public func lint(path: String, excludes: [String], hit: ((Violation) -> Void)? = { print($0) }) throws -> [Violation] {
-        var isDirectory: ObjCBool = false
+    public func lint(path: String,
+                     config: Configuration,
+                     hit: ((Violation) -> Void)? = { print($0) }) throws -> [Violation] {
         
+        var isDirectory: ObjCBool = false
         guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else {
             print("💔File does not exist at \(path).")
             return []
@@ -49,7 +51,7 @@ extension Rule {
         
         guard
             let dir = components.last,
-            !excludes.contains(String(dir))
+            !config.excludes.contains(String(dir))
         else {
                 print("💔Excluding path: \(path).")
                 return []
@@ -68,7 +70,7 @@ extension Rule {
         
         var violations: [Violation] = []
         
-        if !NSPredicate(format: "SELF MATCHES[cd] \"\(pattern)\"").evaluate(with: fileName) {
+        if !NSPredicate(format: "SELF MATCHES[cd] \"\(isRelativedToBasePattern ?? true ? config.basePattern + pattern : pattern)\"").evaluate(with: fileName) {
             let violation = Violation(file: path,
                                       severity: severity,
                                       reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \(pattern)")

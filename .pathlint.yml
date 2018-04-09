@@ -1,11 +1,11 @@
+base_pattern: \[a-zA-z0-9_-\[\\+\]\]*
 rules:
-- path: Models/
-  pattern: \[a-zA-z0-9_-\[\\+\]\]*Model.swift
-  uppercasePrefix: true
-  severity: error
-  against: false
-  ignores:
-    -
+  - path: Models/
+    pattern: Model.swift
+    severity: error
+    relative_to_base: true
+    ignores:
+      -
 excludes:
   - .build
   - .git
