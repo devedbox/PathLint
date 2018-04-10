@@ -14,6 +14,7 @@ public struct PathRule: RuleProtocol, Decodable {
         case severity
         case isRelativedToBasePattern = "relative_to_base"
         case ignores
+        case contentRules = "content_rules"
     }
     
     public let path: String // The file directory end node: Models/
@@ -23,6 +24,8 @@ public struct PathRule: RuleProtocol, Decodable {
     public let isRelativedToBasePattern: Bool?
     
     public let ignores: [String]
+    /// Rules to lint with the content of the file.
+    public let contentRules: [FileContentsRule]?
 }
 
 extension PathRule {
@@ -65,6 +68,6 @@ extension PathRule {
             hit?(violation)
             violations.append(violation)
         }
-        return violations
+        return violations + (try contentRules?.flatMap { try $0.lint(path: path, config: config, hit: hit) } ?? [])
     }
 }
