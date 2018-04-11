@@ -20,7 +20,7 @@ public enum FileContentsRuleError: CustomStringConvertible, Error {
 
 public struct FileContentsRule: RuleProtocol, Decodable {
     /// The violation fixing pattern.
-    public let fixing: String
+    public let fixing: String?
     public let prompt: String
     public var pattern: String
     public var severity: ReportSeverity
@@ -36,19 +36,22 @@ extension FileContentsRule {
         return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
             .matches(in: content, options: [.reportCompletion], range: NSRange(location: 0, length: (content as NSString).length))
             .flatMap {
-                guard
-                    try NSRegularExpression(pattern: "\(pattern)\\s//\\s\(NSRegularExpression.escapedPattern(for: fixing))",
-                        options: [.caseInsensitive])
-                        .matches(in: content,
-                                 options: [.reportCompletion],
-                                 range: NSRange(location: $0.range.location,
-                                                length: max((content as NSString).length - $0.range.location, $0.range.length
-                                                    + (fixing as NSString).length
-                                                    + 4)))
-                        .isEmpty
-                else {
-                    return nil
+                if  let fixing = self.fixing {
+                    
+                    let pattern = "\(self.pattern)\\s//\\s\(NSRegularExpression.escapedPattern(for: fixing))"
+                    let range = NSRange(location: $0.range.location,
+                                        length: min((content as NSString).length - $0.range.location, $0.range.length
+                                            + (fixing as NSString).length
+                                            + 4))
+                    guard
+                        try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
+                            .matches(in: content, options: [.reportCompletion], range: range)
+                            .isEmpty
+                        else {
+                            return nil
+                    }
                 }
+                
                 let range = content.range(from: NSRange(location: 0, length: $0.range.location))
                 let prefix = content[range]
                 let lines = prefix.components(separatedBy: .newlines)
