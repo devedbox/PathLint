@@ -32,7 +32,7 @@ extension PathRule {
     /// Lint the given path with the rule
     public func lint(path: String,
                      config: Configuration,
-                     hit: ((Violation) -> Void)? = { print($0) }) throws -> [Violation] {
+                     hit: ((Violation) -> Void)? = { asyncPrint($0) }) throws -> [Violation] {
         
         guard _checkingFileExists(at: path) == (true, false) else { return [] }
         
@@ -43,18 +43,18 @@ extension PathRule {
             let dir = components.last,
             !config.excludes.contains(String(dir))
         else {
-                print("💔Excluding path: \(path).")
-                return []
+            asyncPrint("💔Excluding path: \(path).")
+            return []
         }
         
         guard NSPredicate(format: "SELF MATCHES[cd] \"\(dir)[/]*\"").evaluate(with: self.path) else {
             return []
         }
         
-        print("Linting \(path)")
+        asyncPrint("Linting \(path)")
         
         guard !ignores.contains(String(fileName)) else {
-            print("Ignoring \(fileName)")
+            asyncPrint("Ignoring \(fileName)")
             return []
         }
         
