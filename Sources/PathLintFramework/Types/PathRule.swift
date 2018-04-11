@@ -32,7 +32,7 @@ extension PathRule {
     /// Lint the given path with the rule
     public func lint(path: String,
                      config: Configuration,
-                     hit: ((Violation) -> Void)? = { asyncPrint($0) }) throws -> [Violation] {
+                     hit: ((Violation) -> Void)? = { print($0) }) throws -> [Violation] {
         
         guard _checkingFileExists(at: path) == (true, false) else { return [] }
         
@@ -43,7 +43,7 @@ extension PathRule {
             let dir = components.last,
             !config.excludes.contains(String(dir))
         else {
-            asyncPrint("💔Excluding path: \(path).")
+            print("💔Excluding path: \(path).")
             return []
         }
         
@@ -51,10 +51,10 @@ extension PathRule {
             return []
         }
         
-        asyncPrint("Linting \(path)")
+        print("Linting \(path)")
         
         guard !ignores.contains(String(fileName)) else {
-            asyncPrint("Ignoring \(fileName)")
+            print("Ignoring \(fileName)")
             return []
         }
         
@@ -68,6 +68,9 @@ extension PathRule {
             hit?(violation)
             violations.append(violation)
         }
-        return violations + (try contentRules?.flatMap { try $0.lint(path: path, config: config, hit: hit) } ?? [])
+        return
+            violations
+            + (try ((contentRules ?? []) + (config.globalContentRules ?? []))
+                .flatMap { try $0.lint(path: path, config: config, hit: hit) } )
     }
 }
