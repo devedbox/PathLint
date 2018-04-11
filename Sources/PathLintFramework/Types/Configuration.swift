@@ -16,11 +16,13 @@ public enum ConfigurationError: String, Error {
 public struct Configuration: Decodable {
     enum CodingKeys: String, CodingKey {
         case basePattern = "base_pattern"
+        case globalContentRules = "global_content_rules"
         case rules
         case excludes
     }
     
     let basePattern: String
+    let globalContentRules: [FileContentsRule]?
     let rules: [PathRule]
     let excludes: [String] // The file directory to be excluded.
 }
