@@ -11,6 +11,7 @@
     import Darwin
 #endif
 import Foundation
+import Dispatch
 
 // MARK: - Public.
 
@@ -69,15 +70,18 @@ public func lint(_ paths: [String], using config: Configuration) throws -> [Viol
 }
 
 public func lint(path: String, using config: Configuration) throws -> [Violation] {
-    return try config.rules.flatMap { try $0.lint(path: path, config: config) }
+    return try config.rules.flatMap { rule in
+        return try DispatchQueue.global(qos: .default).sync {
+            try rule.lint(path: path, config: config)
+        }
+    }
 }
 
 public func execute(exit exitCode: Int32, throwing: () throws -> Void) {
     do {
         try throwing()
     } catch let error {
-        print(error)
-        exit(exitCode)
+        print(error); exit(exitCode)
     }
 }
 
@@ -86,10 +90,10 @@ public func execute(exit exitCode: Int32, throwing: () throws -> Void) {
 internal func _checkingFileExists(at path: String) -> (Bool, Bool) {
     var isDirectory: ObjCBool = false
     defer {
-        isDirectory.boolValue ? asyncPrint("💔Empty contents at \(path).") : ()
+        !isDirectory.boolValue ? print("💔Empty contents at \(path).") : ()
     }
     guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else {
-        asyncPrint("💔File does not exist at \(path).")
+        print("💔File does not exist at \(path).")
         return (exists: false, isDirectory: isDirectory.boolValue)
     }
     return (exists: true, isDirectory: isDirectory.boolValue)
