@@ -35,7 +35,7 @@ extension FileContentsRule {
                                  encoding: .utf8)
         return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
             .matches(in: content, options: [.reportCompletion], range: NSRange(location: 0, length: (content as NSString).length))
-            .flatMap {
+            .optionalMap {
                 if  let fixing = self.fixing {
                     
                     let pattern = "\(self.pattern)\\s//\\s\(NSRegularExpression.escapedPattern(for: fixing))"
