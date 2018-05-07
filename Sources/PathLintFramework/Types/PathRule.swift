@@ -34,7 +34,7 @@ extension PathRule {
                      config: Configuration,
                      hit: ((Violation) -> Void)? = { print($0) }) throws -> [Violation] {
         
-        guard _checkingFileExists(at: path) == (true, false) else { return [] }
+        guard try _checkingFileExists(at: path) == (true, false) else { return [] }
         
         var components = path.split(separator: "/")
         let fileName = components.removeLast()

@@ -28,7 +28,7 @@ public struct FileContentsRule: RuleProtocol, Decodable {
 
 extension FileContentsRule {
     public func lint(path: String, config: Configuration, hit: ((Violation) -> Void)?) throws -> [Violation] {
-        guard _checkingFileExists(at: path) == (true, false) else { return [] }
+        guard try _checkingFileExists(at: path) == (true, false) else { return [] }
         
         let content = try String(contentsOf: URL(fileURLWithPath: path,
                                                  isDirectory: false),

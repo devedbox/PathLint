@@ -87,14 +87,16 @@ public func execute(exit exitCode: Int32, throwing: () throws -> Void) {
 
 // MARK: - Internal.
 
-internal func _checkingFileExists(at path: String) -> (Bool, Bool) {
+internal func _checkingFileExists(at path: String) throws -> (Bool, Bool) {
     var isDirectory: ObjCBool = false
-    defer {
-        !isDirectory.boolValue ? print("💔Empty contents at \(path).") : ()
-    }
+    
     guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else {
         print("💔File does not exist at \(path).")
         return (exists: false, isDirectory: isDirectory.boolValue)
     }
+    if isDirectory.boolValue, try FileManager.default.contentsOfDirectory(atPath: path).isEmpty {
+        print("💔Empty contents at \(path).")
+    }
+    
     return (exists: true, isDirectory: isDirectory.boolValue)
 }
