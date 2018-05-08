@@ -7,9 +7,13 @@
 
 import Foundation
 
+// MARK: - FileContentsRuleError.
+
+/// Error type represents the error info of file contents rule domain.
 public enum FileContentsRuleError: CustomStringConvertible, Error {
+    /// Invalid contents of the given path.
     case invalidContents(path: String)
-    
+    /// Returns the description of the error.
     public var description: String {
         switch self {
         case .invalidContents(path: let path):
@@ -18,15 +22,30 @@ public enum FileContentsRuleError: CustomStringConvertible, Error {
     }
 }
 
-public struct FileContentsRule: RuleProtocol, Decodable {
-    /// The violation fixing pattern.
+// MARK: - FileContentsRule.
+
+/// A type represents the rule of the contents of a given path.
+public struct FileContentsRule: Decodable {
+    /// The violation fixing pattern, using this to eliminate the violation.
     public let fixing: String?
+    /// Prompt of the violation to show as a notice.
     public let prompt: String
+    /// The pattern of the contents rule.
     public var pattern: String
+    /// Value of `ReportSeverity` indicates the warning or error.
     public var severity: ReportSeverity
 }
 
-extension FileContentsRule {
+// MARK: - RuleProtocol.
+
+extension FileContentsRule: RuleProtocol {
+    /// Lint the given path with the rule pattern.
+    ///
+    /// - Parameter path: The path to be validated.
+    /// - Parameter config: The configuration of the lint target.
+    /// - Parameter hit: Closure to be triggered when matching results.
+    ///
+    /// - Returns: Violations of the given path and all subpaths.
     public func lint(path: String, config: Configuration, hit: ((Violation) -> Void)?) throws -> [Violation] {
         guard try _checkingFileExists(at: path) == (true, false) else { return [] }
         
