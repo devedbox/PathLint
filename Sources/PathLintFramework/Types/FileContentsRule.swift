@@ -85,7 +85,7 @@ extension FileContentsRule: RuleProtocol {
                                           character: (lines.last?.lengthOfBytes(using: .utf8) ?? 1) + 1,
                                           file: path,
                                           severity: severity,
-                                          reason: "File Content Violation: \(prompt)")
+                                          reason: "File Content Violation: \(prompt)\(fixing == nil ? "" : ", using `\(fixing!)` to ignore.")")
                 hit?(violation)
                 return violation
         }
