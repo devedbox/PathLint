@@ -15,8 +15,8 @@ public let spec = Spec()
 // MARK: -
 
 extension Spec {
-    /// Returns the current version of `PathLintFramework`.
-    public var version: String {
-        return "0.0.7"
-    }
+  /// Returns the current version of `PathLintFramework`.
+  public var version: String {
+    return "0.0.7"
+  }
 }

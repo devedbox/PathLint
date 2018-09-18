@@ -6,23 +6,23 @@
 //
 
 #if os(Linux)
-    import Glibc
+import Glibc
 #else
-    import Darwin
+import Darwin
 #endif
 import PathLintFramework
 import Dispatch
 
 DispatchQueue.global(qos: .default).async {
-    execute(exit: 2) {
-        exit(
-            try lint(config: try Configuration.default())
-                .filter { $0.severity == .error }
-                .isEmpty
-                ? 0
-                : 1
-        )
-    }
+  execute(exit: 2) {
+    exit(
+      try lint(config: try Configuration.default())
+        .filter { $0.severity == .error }
+        .isEmpty
+        ? 0
+        : 1
+    )
+  }
 }
 
 dispatchMain()

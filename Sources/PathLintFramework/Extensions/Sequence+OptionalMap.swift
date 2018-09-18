@@ -6,11 +6,13 @@
 //
 
 extension Sequence {
-    public func optionalMap<ElementOfResult>(_ transform: (Self.Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
-        #if swift(>=4.1)
-        return try compactMap(transform)
-        #else
-        return try flatMap(transform)
-        #endif
-    }
+  public func optionalMap<ElementOfResult>(
+    _ transform: (Self.Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
+  {
+    #if swift(>=4.1)
+    return try compactMap(transform)
+    #else
+    return try flatMap(transform)
+    #endif
+  }
 }

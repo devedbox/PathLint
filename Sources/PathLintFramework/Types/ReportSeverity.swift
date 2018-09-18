@@ -9,9 +9,8 @@
 
 /// A type represents the report type of the lint result.
 public enum ReportSeverity: String, Decodable {
-    /// Value indicates the warnings of the lint result.
-    case warning
-    /// Value indicates the errors of the lint result.
-    case error
+  /// Value indicates the warnings of the lint result.
+  case warning
+  /// Value indicates the errors of the lint result.
+  case error
 }
-
