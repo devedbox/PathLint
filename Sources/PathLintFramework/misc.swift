@@ -19,8 +19,8 @@ public func getcwd() -> String {
   return FileManager.default.currentDirectoryPath
 }
 
-public func asyncPrint<T>(_ t: T, on queue: DispatchQueue = DispatchQueue.main) { queue.async { print(t) } }
-public func syncPrint<T>(_ t: T, on queue: DispatchQueue = DispatchQueue.main) { queue.sync { print(t) } }
+public func asyncPrint<T>(_ t: T, on queue: DispatchQueue = .main) { queue.async { print(t) } }
+public func syncPrint<T>(_ t: T, on queue: DispatchQueue = .main) { queue.sync { print(t) } }
 
 public func lint(
   config: Configuration) throws -> [Violation]

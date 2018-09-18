@@ -31,7 +31,7 @@ public struct Configuration: Decodable {
     /// Coding key for `base_pattern`.
     case basePattern = "base-file-pattern"
     /// Coding key for `global_content_rules`.
-    case globalContentRules = "file-content-rules"
+    case globalContentRules = "global-content-rules"
     /// Coding key for `rules`.
     case rules = "file-rules"
     /// Coding key for `excludes`.

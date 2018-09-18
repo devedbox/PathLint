@@ -21,11 +21,11 @@ public struct PathRule: Decodable {
     /// Coding key for `severity`.
     case severity
     /// Coding key for `relative_to_base`.
-    case isRelativedToBasePattern = "relative_to_base"
+    case isRelativedToBasePattern = "relative-to-base"
     /// Coding key for `ignores.`
     case ignores
     /// Coding key for `content_rules`.
-    case contentRules = "content_rules"
+    case contentRules = "content-rules"
   }
   /// Path suffix to check with the pattern.
   public let path: String // The file directory end node: Models/
@@ -58,6 +58,11 @@ extension PathRule: RuleProtocol {
   {
     // Pre condition.
     guard try _checkingFileExists(at: path) == (true, false) else { return [] }
+    
+    let fileContentViolations =
+      (try ((contentRules ?? []) + (config.globalContentRules ?? []))
+        .flatMap { try $0.lint(path: path, config: config, hit: hit) } )
+    
     // Get the file name.
     var components = path.split(separator: "/")
     let fileName = components.removeLast()
@@ -65,23 +70,23 @@ extension PathRule: RuleProtocol {
     guard
       let dir = components.last,
       !config.excludes.contains(String(dir))
-      else {
-        print("💔Excluding path: \(path).")
-        return []
-    }
-    // Make sure the path is on the given dir of the rule.
-    guard NSPredicate(format: "SELF MATCHES[cd] \"\(dir)[/]*\"").evaluate(with: self.path) else {
-      return []
+    else {
+      print("💔Excluding path: \(path).")
+      return fileContentViolations
     }
     // Logging.
     print("Linting \(path)")
+    // Make sure the path is on the given dir of the rule.
+    guard NSPredicate(format: "SELF MATCHES[cd] \"\(dir)[/]*\"").evaluate(with: self.path) else {
+      return fileContentViolations
+    }
     // Ignoring file name.
     guard !ignores.contains(String(fileName)) else {
       print("Ignoring \(fileName)")
-      return []
+      return fileContentViolations
     }
     
-    var violations: [Violation] = []
+    var fileViolations: [Violation] = []
     let finalPattern = isRelativedToBasePattern ?? true ? config.basePattern + pattern : pattern
     
     if !NSPredicate(format: "SELF MATCHES[cd] \"\(finalPattern)\"").evaluate(with: fileName) {
@@ -91,11 +96,8 @@ extension PathRule: RuleProtocol {
         reason: "File Path Violation: File name `\(fileName)` should followd by pattern: \(finalPattern)"
       )
       hit?(violation)
-      violations.append(violation)
+      fileViolations.append(violation)
     }
-    return
-      violations
-        + (try ((contentRules ?? []) + (config.globalContentRules ?? []))
-          .flatMap { try $0.lint(path: path, config: config, hit: hit) } )
+    return fileViolations + fileContentViolations
   }
 }
