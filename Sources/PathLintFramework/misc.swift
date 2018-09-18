@@ -22,60 +22,12 @@ public func getcwd() -> String {
 public func asyncPrint<T>(_ t: T, on queue: DispatchQueue = DispatchQueue.main) { queue.async { print(t) } }
 public func syncPrint<T>(_ t: T, on queue: DispatchQueue = DispatchQueue.main) { queue.sync { print(t) } }
 
-public func findPathsRecursively(
-  at path: String = getcwd(),
-  using config: Configuration) throws -> [String]
-{
-  guard config.excludes.filter({ path.hasSuffix($0) }).isEmpty else {
-    return []
-  }
-  
-  let fileManager = FileManager.default
-  var isDirectory: ObjCBool = false
-  
-  guard fileManager.fileExists(atPath: path, isDirectory: &isDirectory) else {
-    return []
-  }
-  
-  guard isDirectory.boolValue else {
-    return [path]
-  }
-  
-  var paths: [String] = []
-  
-  let contents = try fileManager.contentsOfDirectory(atPath: path)
-  try contents.forEach { content in
-    
-    guard fileManager.fileExists(
-      atPath: path.path(byAppending: content),
-      isDirectory: &isDirectory
-    ) else {
-      return
-    }
-    
-    if isDirectory.boolValue {
-      // Then find again.
-      paths.append(
-        contentsOf: try findPathsRecursively(
-          at: path.path(byAppending: content),
-          using: config
-        )
-      )
-    } else {
-      // I think we have founds.
-      if config.excludes.filter({ content.hasSuffix($0) }).isEmpty {
-        paths.append(path.path(byAppending: content))
-      }
-    }
-  }
-  
-  return paths
-}
-
 public func lint(
   config: Configuration) throws -> [Violation]
 {
-  return try lint(findPathsRecursively(using: config), using: config)
+  return try lint(try FileManager.default.nodes(in: getcwd(), filter: { path in
+    config.excludes.filter { path.hasSuffix($0) }.isEmpty
+  }), using: config)
 }
 
 public func lint(
